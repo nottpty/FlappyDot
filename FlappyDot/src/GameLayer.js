@@ -3,9 +3,36 @@ var GameLayer = cc.LayerColor.extend({
 		this.player = new Player();
         this.player.setPosition( new cc.Point( screenWidth / 2, screenHeight / 2 ) );
         this.addChild( this.player );
-        this.player.addKeyboardHandlers();
+        this.addKeyboardHandlers();
+        this.state = GameLayer.STATES.FRONT;
         this.player.scheduleUpdate();
-	}
+	},
+    addKeyboardHandlers: function(){
+        var self = this;
+        cc.eventManager.addListener({
+            event: cc.EventListener.KEYBOARD,
+            onKeyPressed: function(keyCode, event) {
+                self.onKeyDown(keyCode, event);
+            },
+             onKeyReleased: function(keyCode, event) {
+                self.onKeyUp(keyCode, event);
+            }
+        }, this);
+    },
+
+    onKeyDown: function() {
+        console.log(this.state);
+        if ( this.state == GameLayer.STATES.FRONT ) {
+            this.state = GameLayer.STATES.STARTED;
+            this.player.start();
+            this.player.jump();
+        } else if ( this.state == GameLayer.STATES.STARTED ) {
+            this.player.jump();
+        }
+    },
+    onKeyUp: function() {
+
+    }
 });
 
 var StartScene = cc.Scene.extend({
@@ -14,5 +41,10 @@ var StartScene = cc.Scene.extend({
         var layer = new GameLayer();
         layer.init();
         this.addChild( layer );
-    }
+    },
 });
+
+GameLayer.STATES = {
+    FRONT: 1,
+    STARTED: 2
+};
